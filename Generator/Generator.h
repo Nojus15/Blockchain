@@ -5,6 +5,7 @@
 #include <random>
 #include <string>
 #include <cstring>
+#include "../File/File.h"
 
 using std::cin;
 using std::cout;
@@ -18,13 +19,13 @@ static const char charSet[] =
     "0123456789"
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "abcdefghijklmnopqrstuvwxyz";
-static const int charSetSize = sizeof(charSet) - 1;
+static const int charSetSize = sizeof(charSet) - 2;
 
 static const char vowels[] = "aeiouy";
-static const int vowelsSize = sizeof(vowels) - 1;
+static const int vowelsSize = sizeof(vowels) - 2;
 
 static const char consonants[] = "qwrtpsdfghjklzxcvbnm";
-static const int consonantsSize = sizeof(consonants) - 1;
+static const int consonantsSize = sizeof(consonants) - 2;
 
 static std::random_device rd;
 static std::mt19937 mt(rd());
@@ -32,8 +33,12 @@ static std::uniform_int_distribution<int> dist(0, strlen(charSet) - 1);
 
 class Generator
 {
-public:
+    File file;
+
     string genName();
     string genString(size_t length);
     int genInt(int min, int max);
+
+public:
+    void genUsersFile(int count, string fileName);
 };

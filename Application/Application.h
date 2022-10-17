@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include "../Generator/Generator.h"
 
 using std::cin;
 using std::cout;
@@ -8,14 +9,7 @@ using std::string;
 
 enum AppMode
 {
-    GenFile,
-    HashFile,
-    HashLine,
-    TestCollisions,
-    TestSpeed,
-    TestCollisionsByPairs,
-    TestKonstitucija,
-    TestAvalanche,
+    GenUsers,
 };
 
 class Application
