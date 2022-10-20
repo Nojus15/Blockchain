@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -6,14 +8,19 @@
 #include <string>
 #include <cstring>
 #include "../File/File.h"
+#include "../Hasher/Hasher.h"
+#include <vector>
 
 using std::cin;
 using std::cout;
 using std::endl;
+using std::left;
 using std::mt19937;
+using std::setw;
 using std::string;
 using std::stringstream;
 using std::to_string;
+using std::vector;
 
 static const char charSet[] =
     "0123456789"
@@ -34,6 +41,7 @@ static std::uniform_int_distribution<int> dist(0, strlen(charSet) - 1);
 class Generator
 {
     File file;
+    Hasher hasher;
 
     string genName();
     string genString(size_t length);
