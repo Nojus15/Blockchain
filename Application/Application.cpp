@@ -27,7 +27,6 @@ void Application::processMode()
     case AppMode::GenUsers:
         if (this->argc != 4)
             throw std::invalid_argument("Invalid argument: --gu used incorrectly");
-        Generator gen;
         gen.genUsersFile(std::atoi(argv[2]), argv[3]);
         break;
     default:

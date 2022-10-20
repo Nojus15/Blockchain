@@ -19,6 +19,7 @@ private:
     char **argv;
     string text;
     AppMode mode;
+    Generator gen;
 
     void processMode();
     void findMode();

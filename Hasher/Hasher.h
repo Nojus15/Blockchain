@@ -20,7 +20,6 @@ class Hasher
 {
 public:
     string hashString(string stringToHash);
-    string addBinary(string b1, string b2);
 
 private:
     const static int hashLength = 64;
@@ -44,4 +43,5 @@ private:
     void modifyAddedZeros();
     void convertBinaryToHex();
     void calcSeed();
+    string addBinary(string b1, string b2);
 };
