@@ -32,3 +32,5 @@
 *.app
 
 testing.cpp
+*.txt
+*.json
