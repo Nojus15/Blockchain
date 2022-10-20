@@ -114,7 +114,7 @@ void Hasher::convertBinaryToHex()
     {
         c = 0;
         t = this->binaryTextStr.substr(pos + 64 * i, 64);
-        while (t.substr(0, 4) == "0000")
+        while (t.substr(0 + c * 4, 4) == "0000")
             c++;
         bitset<64> hashSet(t);
         res << string(c, '0') << hex << hashSet.to_ullong();
