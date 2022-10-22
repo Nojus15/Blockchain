@@ -66,7 +66,7 @@ void Generator::genTransactionsFile(int count, string usersFile, string resFile)
         users.emplace_back(name, publicKey, balance);
     }
 
-    int userCount = users.size();
+    int userCount = users.size() - 1;
     Transaction *tx;
     User *sender, *reciever;
     int amount;
