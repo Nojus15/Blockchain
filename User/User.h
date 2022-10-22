@@ -9,11 +9,13 @@ using std::string;
 class User
 {
 private:
-    std::string name;
-    std::string publicKey;
+    string name;
+    string publicKey;
     int balance;
 
 public:
+    User(string name, string pk, int bal);
+
     string getName();
     string getPublicKey();
     int getBalance();

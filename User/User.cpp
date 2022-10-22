@@ -1,5 +1,12 @@
 #include "User.h"
 
+User::User(string name, string pk, int bal)
+{
+    this->name = name;
+    this->publicKey = pk;
+    this->balance = bal;
+};
+
 string User::getName()
 {
     return this->name;
