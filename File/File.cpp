@@ -20,7 +20,7 @@ stringstream File::readFile(string file_name)
 
 void File::writeFile(string file_name, stringstream &ss)
 {
-    std::ofstream file(file_name);
+    std::ofstream file("txt_files/" + file_name);
     file << ss.rdbuf();
     file.close();
 }
