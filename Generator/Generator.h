@@ -9,6 +9,8 @@
 #include <cstring>
 #include "../File/File.h"
 #include "../Hasher/Hasher.h"
+#include "../User/User.h"
+#include "../Transaction/Transaction.h"
 #include <vector>
 
 using std::cin;
@@ -48,5 +50,6 @@ class Generator
     int genInt(int min, int max);
 
 public:
-    void genUsersFile(int count, string fileName);
+    void genUsersFile(int count, string resFile);
+    void genTransactionsFile(int count, string usersFile, string resFile);
 };

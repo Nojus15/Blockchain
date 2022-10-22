@@ -40,7 +40,7 @@ int Generator::genInt(int min, int max)
     std::uniform_int_distribution<int> dist(min, max);
     return dist(mt);
 }
-void Generator::genUsersFile(int count, string fileName)
+void Generator::genUsersFile(int count, string resFile)
 {
     stringstream os;
 
@@ -48,5 +48,60 @@ void Generator::genUsersFile(int count, string fileName)
     {
         os << setw(15) << left << this->genName() << " " << hasher.hashString(this->genString(100)) << " " << this->genInt(100, 100000) << endl;
     }
-    file.writeFile(fileName, os);
+    file.writeFile(resFile, os);
 }
+
+void Generator::genTransactionsFile(int count, string usersFile, string resFile)
+{
+
+    stringstream usersSS = file.readFile(usersFile);
+    vector<User> users;
+
+    string name;
+    string publicKey;
+    int balance;
+
+    while (usersSS >> name && usersSS >> publicKey && usersSS >> balance)
+    {
+        users.emplace_back(name, publicKey, balance);
+    }
+
+    int userCount = users.size();
+    Transaction *tx;
+    User *sender, *reciever;
+    int amount;
+
+    vector<Transaction> txs(count);
+
+    for (int i = 0; i < count; i++)
+    {
+        sender = &users.at(this->genInt(0, userCount));
+        reciever = &users.at(this->genInt(0, userCount));
+
+        if (sender == reciever)
+        {
+            i--;
+            continue;
+        }
+        amount = this->genInt(0, sender->getBalance());
+        tx = &txs.at(i);
+        tx->setTxID(this->hasher.hashString(sender->getPublicKey() + reciever->getPublicKey() + to_string(amount)));
+        tx->addInput(sender->getPublicKey(), sender->getBalance());
+        tx->addOutput(sender->getPublicKey(), sender->getBalance() - amount);
+        tx->addOutput(reciever->getPublicKey(), amount);
+    }
+
+    stringstream os;
+
+    for (auto &tx : txs)
+    {
+        os << tx.getTxID() << endl;
+        for (auto &in : tx.getInputs())
+            os << in.userPK << " " << in.amount << " ";
+        os << endl;
+        for (auto &out : tx.getOutputs())
+            os << out.userPK << " " << out.amount << " ";
+        os << endl;
+    }
+    file.writeFile(resFile, os);
+};
