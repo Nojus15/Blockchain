@@ -10,6 +10,7 @@ using std::string;
 enum AppMode
 {
     GenUsers,
+    GenTransactions,
 };
 
 class Application
