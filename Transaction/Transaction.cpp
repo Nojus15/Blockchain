@@ -1,14 +1,15 @@
 #include "Transaction.h"
 
+Transaction::Transaction(){};
 Transaction::Transaction(string id)
 {
     this->txID = id;
 }
-
-string Transaction::getTxID()
+void Transaction::setTxID(string id)
 {
-    return this->txID;
+    this->txID = id;
 };
+
 void Transaction::addInput(string senderPK, int amount)
 {
     this->in.emplace_back(senderPK, amount);
@@ -16,6 +17,10 @@ void Transaction::addInput(string senderPK, int amount)
 void Transaction::addOutput(string recieverPK, int amount)
 {
     this->out.emplace_back(recieverPK, amount);
+};
+string Transaction::getTxID()
+{
+    return this->txID;
 };
 vector<Operation> Transaction::getInputs()
 {

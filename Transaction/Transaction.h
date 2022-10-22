@@ -21,10 +21,12 @@ private:
     string txID;
 
 public:
+    Transaction();
     Transaction(string id);
-    string getTxID();
+    void setTxID(string id);
     void addInput(string senderPK, int amount);
     void addOutput(string recieverPK, int amount);
+    string getTxID();
     vector<Operation> getInputs();
     vector<Operation> getOutputs();
 };
