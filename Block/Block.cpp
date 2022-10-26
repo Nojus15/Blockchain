@@ -40,6 +40,19 @@ Transaction *Block::getTransaction(string id)
     }
     return nullptr;
 };
+Transaction *Block::getTransaction(string id)
+{
+    for (auto &tx : this->transactions)
+    {
+        if (tx.getTxID() == id)
+            return &tx;
+    }
+    return nullptr;
+};
+vector<Transaction> Block::getAllTransaction()
+{
+    return this->transactions;
+}
 size_t Block::getTransactionCount()
 {
     return this->transactions.size();
