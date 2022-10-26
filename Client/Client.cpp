@@ -3,6 +3,7 @@
 void Client::startMining()
 {
     vector<Transaction> allTransactions(this->getAllTransactions());
+    unordered_map<string, User> users(this->getAllUsers());
     int difficulty = 0;
     string target, merkleHash, timestamp, prevHash, guess;
     int nonce = 0;
@@ -48,8 +49,16 @@ void Client::startMining()
 
         nonce = 0;
         allTransactions.erase(allTransactions.begin() + pos, allTransactions.begin() + pos + count);
+        for (auto &tx : txsToBlock)
+        {
+            for (auto &in : tx.getInputs())
+                users.at(in.userPK).updateBalance(in.amount);
+            for (auto &out : tx.getOutputs())
+                users.at(out.userPK).updateBalance(out.amount * -1);
+        }
     }
     this->printBlocksToFile();
+    this->printUsersToFile(users);
 }
 vector<Transaction> Client::getAllTransactions()
 {
@@ -86,6 +95,23 @@ vector<Transaction> Client::getAllTransactions()
     }
     return transactions;
 }
+unordered_map<string, User> Client::getAllUsers()
+{
+    std::unordered_map<string, User> users;
+    File file;
+    stringstream usersSS = file.readFile("users.txt");
+
+    string name;
+    string publicKey;
+    int balance;
+
+    while (usersSS >> name && usersSS >> publicKey && usersSS >> balance)
+    {
+        users.insert(std::make_pair(publicKey, User(name, publicKey, balance)));
+    }
+    return users;
+};
+
 string Client::getTargetHash(int difficulty)
 {
     string target(64, '7');
@@ -118,3 +144,25 @@ void Client::printBlocksToFile()
     File file;
     file.writeFile("blocks.txt", os);
 };
+// void Client::readBlocksFromFile(){
+
+// };
+
+// void Client::getBlockCount(){
+
+// };
+// void Client::getBlockInfo(int pos){
+
+// };
+void Client::printUsersToFile(unordered_map<string, User> users)
+{
+
+    stringstream os;
+    File file;
+
+    for (auto &user : users)
+    {
+        os << setw(15) << left << user.second.getName() << " " << user.second.getPublicKey() << " " << user.second.getBalance() << endl;
+    }
+    file.writeFile("users.txt", os);
+}

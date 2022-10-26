@@ -6,6 +6,7 @@
 #include <chrono>
 #include <ctime>
 #include <iomanip>
+#include <unordered_map>
 #include "../Block/Block.h"
 #include "../Hasher/Hasher.h"
 #include "../Transaction/Transaction.h"
@@ -22,6 +23,7 @@ using std::right;
 using std::setw;
 using std::string;
 using std::stringstream;
+using std::unordered_map;
 using std::vector;
 
 class Client
@@ -31,9 +33,14 @@ class Client
     Hasher hasher;
 
     vector<Transaction> getAllTransactions();
+    unordered_map<string, User> getAllUsers();
     string getTargetHash(int difficulty);
     void printBlocksToFile();
+    // void readBlocksFromFile();
+    void printUsersToFile(unordered_map<string, User> users);
 
 public:
     void startMining();
+    // void getBlockCount();
+    // void getBlockInfo(int pos);
 };
