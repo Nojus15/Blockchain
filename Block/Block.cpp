@@ -40,15 +40,6 @@ Transaction *Block::getTransaction(string id)
     }
     return nullptr;
 };
-Transaction *Block::getTransaction(string id)
-{
-    for (auto &tx : this->transactions)
-    {
-        if (tx.getTxID() == id)
-            return &tx;
-    }
-    return nullptr;
-};
 vector<Transaction> Block::getAllTransactions()
 {
     return this->transactions;
