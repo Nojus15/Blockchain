@@ -46,10 +46,10 @@ class Generator
     Hasher hasher;
 
     string genName();
-    string genString(size_t length);
-    int genInt(int min, int max);
 
 public:
+    string genString(size_t length);
+    int genInt(int min, int max);
     void genUsersFile(int count, string resFile);
     void genTransactionsFile(int count, string usersFile, string resFile);
 };
