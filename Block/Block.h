@@ -31,6 +31,8 @@ public:
     string getVersion();
     string getMekleRootHash();
     Transaction *getTransaction(string id);
-    vector<Transaction> getAllTransaction();
+    vector<Transaction> getAllTransactions();
     size_t getTransactionCount();
+    int getNonce();
+    int getDifficulty();
 };

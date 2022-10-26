@@ -49,11 +49,19 @@ Transaction *Block::getTransaction(string id)
     }
     return nullptr;
 };
-vector<Transaction> Block::getAllTransaction()
+vector<Transaction> Block::getAllTransactions()
 {
     return this->transactions;
 }
 size_t Block::getTransactionCount()
 {
     return this->transactions.size();
+};
+int Block::getNonce()
+{
+    return this->nonce;
+};
+int Block::getDifficulty()
+{
+    return this->difficulty;
 };
