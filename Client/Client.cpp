@@ -144,16 +144,70 @@ void Client::printBlocksToFile()
     File file;
     file.writeFile("blocks.txt", os);
 };
-// void Client::readBlocksFromFile(){
+vector<Block> Client::readBlocksFromFile()
+{
+    File file;
+    stringstream blocksSS = file.readFile("blocks.txt");
+    vector<Block> blocks;
 
-// };
+    string temp, blockInfo;
+    std::stringstream inputs, outputs;
+    string userPK;
+    int amount;
 
-// void Client::getBlockCount(){
+    while (blocksSS)
+    {
+        Transaction *t;
+        getline(blocksSS, blockInfo);
 
-// };
-// void Client::getBlockInfo(int pos){
+        if (blockInfo.length() == 0 || blockInfo.length() == 0)
+            break;
 
-// };
+        stringstream line(blockInfo);
+
+        string hash, prevHash, timestamp, version, merkleRootHash;
+        int nonce, difficulty;
+        vector<Transaction> transactions;
+
+        line >> hash >> merkleRootHash >> prevHash >> difficulty >> timestamp >> nonce >> version;
+        while (blocksSS && temp != string(66, '-'))
+        {
+            getline(blocksSS, temp);
+            t = new Transaction(temp);
+
+            getline(blocksSS, temp);
+            inputs << temp;
+            getline(blocksSS, temp);
+            outputs << temp;
+
+            while (inputs >> userPK && inputs >> amount)
+                t->addInput(userPK, amount);
+            while (outputs >> userPK && outputs >> amount)
+                t->addOutput(userPK, amount);
+            transactions.push_back(*t);
+        }
+
+        inputs.clear();
+        outputs.clear();
+        blocks.emplace_back(hash, prevHash, timestamp, version, merkleRootHash, nonce, difficulty, transactions);
+    }
+    return blocks;
+};
+
+void Client::getBlockCount()
+{
+    cout << this->readBlocksFromFile().size() << endl;
+};
+void Client::getBlockInfo(int pos)
+{
+    Block block = this->readBlocksFromFile().at(pos);
+
+    cout << setw(15) << left << "Hash:" << setw(64) << right << block.getBlockHash() << setw(15) << left << "" << setw(18) << left << "Nonce:" << setw(20) << right << block.getNonce() << endl;
+    cout << setw(15) << left << "Prev hash:" << setw(64) << right << block.getPrevHash() << setw(15) << left << "" << setw(18) << left << "Transaction count:" << setw(20) << right << block.getTransactionCount() << endl;
+    cout << setw(15) << left << "Merkle hash:" << setw(64) << right << block.getMekleRootHash() << setw(15) << left << "" << setw(18) << left << "Time stamp:" << setw(20) << right << block.getTimestamp() << endl;
+    cout << setw(15) << left << "" << setw(64) << right << "" << setw(15) << left << "" << setw(18) << left << "Difficulty:" << setw(20) << right << block.getDifficulty() << endl;
+    cout << endl;
+};
 void Client::printUsersToFile(unordered_map<string, User> users)
 {
 

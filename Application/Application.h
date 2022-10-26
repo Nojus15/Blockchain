@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "../Generator/Generator.h"
+#include "../Client/Client.h"
 
 using std::cin;
 using std::cout;
@@ -11,6 +12,9 @@ enum AppMode
 {
     GenUsers,
     GenTransactions,
+    Mine,
+    GetBlockCount,
+    GetBlockInfo,
 };
 
 class Application
@@ -21,6 +25,7 @@ private:
     string text;
     AppMode mode;
     Generator gen;
+    Client cli;
 
     void processMode();
     void findMode();

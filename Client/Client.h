@@ -36,11 +36,11 @@ class Client
     unordered_map<string, User> getAllUsers();
     string getTargetHash(int difficulty);
     void printBlocksToFile();
-    // void readBlocksFromFile();
+    vector<Block> readBlocksFromFile();
     void printUsersToFile(unordered_map<string, User> users);
 
 public:
     void startMining();
-    // void getBlockCount();
-    // void getBlockInfo(int pos);
+    void getBlockCount();
+    void getBlockInfo(int pos);
 };
