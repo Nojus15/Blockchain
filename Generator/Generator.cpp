@@ -40,7 +40,7 @@ int Generator::genInt(int min, int max)
     std::uniform_int_distribution<int> dist(min, max);
     return dist(mt);
 }
-void Generator::genUsersFile(int count, string resFile)
+void Generator::genUsersFile(int count)
 {
     stringstream os;
 
@@ -48,13 +48,13 @@ void Generator::genUsersFile(int count, string resFile)
     {
         os << setw(15) << left << this->genName() << " " << hasher.hashString(this->genString(100)) << " " << this->genInt(100, 100000) << endl;
     }
-    file.writeFile(resFile, os);
+    file.writeFile("users.txt", os);
 }
 
-void Generator::genTransactionsFile(int count, string usersFile, string resFile)
+void Generator::genTransactionsFile(int count)
 {
 
-    stringstream usersSS = file.readFile(usersFile);
+    stringstream usersSS = file.readFile("users.txt");
     vector<User> users;
 
     string name;
@@ -103,5 +103,5 @@ void Generator::genTransactionsFile(int count, string usersFile, string resFile)
             os << out.userPK << " " << out.amount << " ";
         os << endl;
     }
-    file.writeFile(resFile, os);
+    file.writeFile("transactions.txt", os);
 };
