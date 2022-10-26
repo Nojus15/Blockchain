@@ -34,19 +34,17 @@ Node *MerkleTree::buildMerkelTree(vector<Node *> &line)
         return line.at(0);
 
     if (line.size() % 2 != 0)
-        line.push_back(line.at(line.size()));
+        line.push_back(line.back());
 
     vector<Node *> topLine;
 
     string concatedHashes;
     string newHash;
     Node *tNode;
-    int counter = 0;
     for (auto it = line.begin(); it != line.end(); it += 2)
     {
         concatedHashes = (**it).hash + (**(it + 1)).hash;
         newHash = this->hasher.hashString(concatedHashes);
-        cout << "Hash " << counter << ": " << newHash << endl;
         tNode = new Node(newHash);
 
         tNode->left = *it;
@@ -56,7 +54,6 @@ Node *MerkleTree::buildMerkelTree(vector<Node *> &line)
         (**(it + 1)).parent = tNode;
 
         topLine.push_back(tNode);
-        counter++;
     }
 
     return this->buildMerkelTree(topLine);
