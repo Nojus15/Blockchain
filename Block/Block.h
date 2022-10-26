@@ -10,10 +10,12 @@ using std::vector;
 class Block
 {
 private:
+    string hash;
+
     // header
     string prevHash;
-    int timestamp;
-    int version;
+    string timestamp;
+    string version;
     string merkleRootHash;
     int nonce;
     int difficulty;
@@ -22,5 +24,12 @@ private:
     vector<Transaction> transactions;
 
 public:
-    Block(string prevHash, int timestamp, int version, string merkleRootHash, int nonce, int difficulty, vector<Transaction> transactions);
+    Block(string hash, string prevHash, string timestamp, string version, string merkleRootHash, int nonce, int difficulty, vector<Transaction> transactions);
+    string getBlockHash();
+    string getPrevHash();
+    string getTimestamp();
+    string getVersion();
+    string getMekleRootHash();
+    Transaction *getTransaction(string id);
+    size_t getTransactionCount();
 };
