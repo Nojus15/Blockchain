@@ -23,4 +23,5 @@ public:
     void setName(string name);
     void setPublicKey(string key);
     void setBalance(int bal);
+    void updateBalance(int bal);
 };

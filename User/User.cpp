@@ -35,3 +35,7 @@ void User::setBalance(int balance)
 {
     this->balance = balance;
 }
+void User::updateBalance(int balance)
+{
+    this->balance += balance;
+}
