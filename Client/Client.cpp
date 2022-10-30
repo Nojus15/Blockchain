@@ -4,12 +4,12 @@ void Client::startMining()
 {
     vector<Transaction> allTransactions(this->getAllTransactions());
     unordered_map<string, User> users(this->getAllUsers());
-    int difficulty = 0;
     string target, merkleHash, timestamp, prevHash, guess;
     int nonce = 0;
     string version = "1";
 
     int count, pos;
+    programTimer.Start();
     while (allTransactions.size() > 0)
     {
         count = gen.genInt(1, allTransactions.size() > 100 ? 100 : allTransactions.size());
@@ -23,11 +23,13 @@ void Client::startMining()
             merkleBuilder->addTransaction(el.getTxID());
         merkleBuilder->genMerkelTree();
 
+        this->ajustDifficulty();
         target = this->getTargetHash(difficulty);
         timestamp = std::to_string(std::chrono::system_clock::now().time_since_epoch().count());
         merkleHash = merkleBuilder->getRootHash();
         prevHash = this->blocks.empty() ? "0000000000000000000000000000000000000000000000000000000000000000" : this->blocks.back().getBlockHash();
 
+        blockTimer.Start();
         while (target < (guess = this->hasher.hashString(prevHash + timestamp + version + to_string(nonce) + merkleHash + to_string(difficulty))))
         {
             if (nonce % 1000 == 0)
@@ -37,6 +39,7 @@ void Client::startMining()
             }
             nonce++;
         }
+        allTime += blockTimer.Stop();
         cout << std::string(100, ' ') << endl; // to remove last line
 
         this->blocks.emplace_back(guess, prevHash, timestamp, version, merkleHash, nonce, difficulty, txsToBlock);
@@ -58,6 +61,7 @@ void Client::startMining()
                 users.at(out.userPK).updateBalance(out.amount * -1);
         }
     }
+    cout << "Average block mine time: " << programTimer.Stop() / this->blocks.size() << endl;
     this->printBlocksToFile();
     this->printUsersToFile(users);
 }
@@ -115,11 +119,15 @@ unordered_map<string, User> Client::getAllUsers()
 
 string Client::getTargetHash(int difficulty)
 {
-    string target(64, '7');
-    for (int i = 0; i < difficulty; i++)
-    {
+    string target(64, 'f');
+
+    int zeroCount = difficulty / 16;
+    int lastLet = 16 - difficulty % 16;
+
+    for (int i = 0; i < zeroCount; i++)
         target[i] = '0';
-    }
+    if (lastLet != 16)
+        target[zeroCount] = symbols[lastLet];
     return target;
 };
 void Client::printBlocksToFile()
@@ -234,3 +242,9 @@ void Client::validateTransactions(vector<Transaction> &txs)
         }
     }
 };
+void Client::ajustDifficulty()
+{
+    difficulty += targetTime - allTime / this->blocks.size();
+    if (difficulty < 0)
+        difficulty = 0;
+}
