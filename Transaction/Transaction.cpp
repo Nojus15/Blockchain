@@ -37,12 +37,13 @@ bool Transaction::isTransactionValid()
     for (auto &in : this->in)
     {
         valToHash += in.userPK;
-        valToHash += in.amount;
+        valToHash += std::to_string(in.amount);
     }
     for (auto &out : this->out)
     {
         valToHash += out.userPK;
-        valToHash += out.amount;
+        valToHash += std::to_string(out.amount);
     }
+
     return txID == hasher.hashString(valToHash);
 };
