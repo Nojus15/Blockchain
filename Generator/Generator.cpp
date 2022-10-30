@@ -88,7 +88,21 @@ void Generator::genTransactionsFile(int count)
         tx->addInput(sender->getPublicKey(), sender->getBalance());
         tx->addOutput(sender->getPublicKey(), sender->getBalance() - amount);
         tx->addOutput(reciever->getPublicKey(), amount);
-        string txIdToHash = sender->getPublicKey() + to_string(sender->getBalance()) + sender->getPublicKey() + to_string(sender->getBalance() - amount) + reciever->getPublicKey() + to_string(amount);
+
+        string valToHash = "";
+
+        for (auto &in : tx->getInputs())
+        {
+            valToHash += in.userPK;
+            valToHash += std::to_string(in.amount);
+        }
+        for (auto &out : tx->getOutputs())
+        {
+            valToHash += out.userPK;
+            valToHash += std::to_string(out.amount);
+        }
+
+        string txIdToHash = sender->getPublicKey() + to_string(sender->getBalance()) + sender->getPublicKey() + to_string((sender->getBalance() - amount)) + reciever->getPublicKey() + to_string(amount);
         tx->setTxID(this->hasher.hashString(txIdToHash));
     }
 
