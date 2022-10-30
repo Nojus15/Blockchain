@@ -13,7 +13,6 @@
 #include "../Generator/Generator.h"
 #include "../File/File.h"
 #include "../MerkleTree/MerkleTree.h"
-#include <signal.h>
 
 using std::cout;
 using std::end;
@@ -38,6 +37,7 @@ class Client
     void printBlocksToFile();
     vector<Block> readBlocksFromFile();
     void printUsersToFile(unordered_map<string, User> users);
+    void validateTransactions(vector<Transaction> &txs);
 
 public:
     void startMining();

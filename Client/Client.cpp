@@ -16,6 +16,7 @@ void Client::startMining()
         pos = gen.genInt(0, allTransactions.size() - count);
 
         vector<Transaction> txsToBlock(allTransactions.begin() + pos, allTransactions.begin() + pos + count);
+        this->validateTransactions(txsToBlock);
 
         MerkleTree *merkleBuilder = new MerkleTree();
         for (auto &el : txsToBlock)
@@ -160,7 +161,7 @@ vector<Block> Client::readBlocksFromFile()
         Transaction *t;
         getline(blocksSS, blockInfo);
 
-        if (blockInfo.length() == 0 || blockInfo.length() == 0)
+        if (blockInfo.length() == 0)
             break;
 
         stringstream line(blockInfo);
@@ -170,11 +171,13 @@ vector<Block> Client::readBlocksFromFile()
         vector<Transaction> transactions;
 
         line >> hash >> merkleRootHash >> prevHash >> difficulty >> timestamp >> nonce >> version;
-        while (blocksSS && temp != string(66, '-'))
+        while (blocksSS)
         {
             getline(blocksSS, temp);
-            t = new Transaction(temp);
+            if (temp == string(66, '-'))
+                break;
 
+            t = new Transaction(temp);
             getline(blocksSS, temp);
             inputs << temp;
             getline(blocksSS, temp);
@@ -220,3 +223,14 @@ void Client::printUsersToFile(unordered_map<string, User> users)
     }
     file.writeFile("users.txt", os);
 }
+void Client::validateTransactions(vector<Transaction> &txs)
+{
+    for (auto it = txs.begin(); it != txs.end(); it++)
+    {
+        if (!(*it).isTransactionValid())
+        {
+            txs.erase(it);
+            it--;
+        }
+    }
+};
