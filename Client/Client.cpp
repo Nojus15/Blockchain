@@ -213,10 +213,16 @@ void Client::getBlockInfo(int pos)
 {
     Block block = this->readBlocksFromFile().at(pos);
 
+    cout << endl;
+    cout << string(150, '-') << endl;
+    cout << endl;
+
     cout << setw(15) << left << "Hash:" << setw(64) << right << block.getBlockHash() << setw(15) << left << "" << setw(18) << left << "Nonce:" << setw(20) << right << block.getNonce() << endl;
     cout << setw(15) << left << "Prev hash:" << setw(64) << right << block.getPrevHash() << setw(15) << left << "" << setw(18) << left << "Transaction count:" << setw(20) << right << block.getTransactionCount() << endl;
     cout << setw(15) << left << "Merkle hash:" << setw(64) << right << block.getMekleRootHash() << setw(15) << left << "" << setw(18) << left << "Time stamp:" << setw(20) << right << block.getTimestamp() << endl;
     cout << setw(15) << left << "" << setw(64) << right << "" << setw(15) << left << "" << setw(18) << left << "Difficulty:" << setw(20) << right << block.getDifficulty() << endl;
+    cout << endl;
+    cout << string(150, '-') << endl;
     cout << endl;
 };
 void Client::printUsersToFile(unordered_map<string, User> users)
