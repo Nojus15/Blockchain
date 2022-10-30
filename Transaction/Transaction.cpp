@@ -30,3 +30,19 @@ vector<Operation> Transaction::getOutputs()
 {
     return this->out;
 };
+bool Transaction::isTransactionValid()
+{
+    string valToHash = "";
+
+    for (auto &in : this->in)
+    {
+        valToHash += in.userPK;
+        valToHash += in.amount;
+    }
+    for (auto &out : this->out)
+    {
+        valToHash += out.userPK;
+        valToHash += out.amount;
+    }
+    return txID == hasher.hashString(valToHash);
+};

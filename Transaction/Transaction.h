@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include "../Hasher/Hasher.h"
 
 using std::string;
 using std::vector;
@@ -13,9 +14,10 @@ struct Operation
     int amount;
 };
 
+static Hasher hasher;
+
 class Transaction
 {
-private:
     vector<Operation> in;
     vector<Operation> out;
     string txID;
@@ -29,4 +31,6 @@ public:
     string getTxID();
     vector<Operation> getInputs();
     vector<Operation> getOutputs();
+
+    bool isTransactionValid();
 };
