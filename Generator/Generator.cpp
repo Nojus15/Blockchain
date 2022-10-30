@@ -85,10 +85,11 @@ void Generator::genTransactionsFile(int count)
         }
         amount = this->genInt(0, sender->getBalance());
         tx = &txs.at(i);
-        tx->setTxID(this->hasher.hashString(sender->getPublicKey() + reciever->getPublicKey() + to_string(amount)));
         tx->addInput(sender->getPublicKey(), sender->getBalance());
         tx->addOutput(sender->getPublicKey(), sender->getBalance() - amount);
         tx->addOutput(reciever->getPublicKey(), amount);
+        string txIdToHash = sender->getPublicKey() + to_string(sender->getBalance()) + sender->getPublicKey() + to_string(sender->getBalance() - amount) + reciever->getPublicKey() + to_string(amount);
+        tx->setTxID(this->hasher.hashString(txIdToHash));
     }
 
     stringstream os;
