@@ -32,5 +32,5 @@ public:
     vector<Operation> getInputs();
     vector<Operation> getOutputs();
 
-    bool isTransactionValid();
+    bool isTransactionHashValid();
 };

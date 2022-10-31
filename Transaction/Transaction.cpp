@@ -30,7 +30,7 @@ vector<Operation> Transaction::getOutputs()
 {
     return this->out;
 };
-bool Transaction::isTransactionValid()
+bool Transaction::isTransactionHashValid()
 {
     string valToHash = "";
 

@@ -181,7 +181,14 @@ void Client::validateTransactions(vector<Transaction> &txs)
 {
     for (auto it = txs.begin(); it != txs.end(); it++)
     {
-        if (!(*it).isTransactionValid())
+        bool userCanMakeTransaction = true;
+        for (auto &input : (*it).getInputs())
+        {
+            if (users.at(input.userPK).getBalance() < input.amount)
+                userCanMakeTransaction = false;
+        }
+
+        if (!(*it).isTransactionHashValid() || !userCanMakeTransaction)
         {
             string txId = (*it).getTxID();
             transactions.erase(std::find_if(transactions.begin(), transactions.end(), [txId](const Transaction &tx)
