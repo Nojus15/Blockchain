@@ -80,6 +80,11 @@ string Block::calcDifficultyTargetHash()
         target[zeroCount] = symbols[lastLet];
     return target;
 };
+int Block::getMinedThreadNumber()
+{
+    return this->threadNumber;
+};
+
 bool Block::mine(bool &isMined)
 {
     Hasher hasher;
@@ -93,6 +98,7 @@ bool Block::mine(bool &isMined)
     if (!isMined && hash < target)
     {
         isMined = true;
+        threadNumber = omp_get_thread_num();
         return true;
     }
 

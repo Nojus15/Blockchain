@@ -28,7 +28,7 @@ private:
     // body
     vector<Transaction> transactions;
 
-    string calcDifficultyTargetHash();
+    int threadNumber = -1;
 
 public:
     Block(string hash, string prevHash, string timestamp, string version, string merkleRootHash, int nonce, int difficulty, vector<Transaction> transactions);
@@ -41,8 +41,10 @@ public:
     Transaction *getTransaction(string id);
     vector<Transaction> &getAllTransactions();
     size_t getTransactionCount();
+    string calcDifficultyTargetHash();
     int getNonce();
     int getDifficulty();
+    int getMinedThreadNumber();
 
     bool mine(bool &isMined);
 };
