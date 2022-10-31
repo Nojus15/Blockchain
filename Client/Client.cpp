@@ -1,76 +1,44 @@
 #include "Client.h"
 
-void Client::startMining()
+void Client::startMining(int numberOfThreads)
 {
-    vector<Transaction> allTransactions(this->getAllTransactions());
-    unordered_map<string, User> users(this->getAllUsers());
-    string target, merkleHash, timestamp, prevHash, guess;
-    int nonce = 0;
-    string version = "1";
+    this->loadAllTransactions();
+    this->loadAllUsers();
+    cout << users.size() << endl;
 
-    int count, pos;
     programTimer.Start();
-    while (allTransactions.size() > 0)
+    while (transactions.size() > 0)
     {
-        count = gen.genInt(1, allTransactions.size() > 100 ? 100 : allTransactions.size());
-        pos = gen.genInt(0, allTransactions.size() - count);
+        vector<Block> blocksCandidates(this->createBlockCandidates(numberOfThreads));
 
-        vector<Transaction> txsToBlock(allTransactions.begin() + pos, allTransactions.begin() + pos + count);
-        this->validateTransactions(txsToBlock);
-
-        MerkleTree *merkleBuilder = new MerkleTree();
-        for (auto &el : txsToBlock)
-            merkleBuilder->addTransaction(el.getTxID());
-        merkleBuilder->genMerkelTree();
-
-        this->ajustDifficulty();
-        target = this->getTargetHash(difficulty);
-        timestamp = std::to_string(std::chrono::system_clock::now().time_since_epoch().count());
-        merkleHash = merkleBuilder->getRootHash();
-        prevHash = this->blocks.empty() ? "0000000000000000000000000000000000000000000000000000000000000000" : this->blocks.back().getBlockHash();
-
+        bool mined = false;
         blockTimer.Start();
-        while (target < (guess = this->hasher.hashString(prevHash + timestamp + version + to_string(nonce) + merkleHash + to_string(difficulty))))
+
+        omp_set_dynamic(0);
+        omp_set_num_threads(numberOfThreads);
+#pragma omp parallel for
+        for (int i = 0; i < numberOfThreads; i++)
         {
-            if (nonce % 1000 == 0)
-            {
-                cout << "Nonce: " << nonce << " Guess: " << guess << '\r';
-                timestamp = std::to_string(std::chrono::system_clock::now().time_since_epoch().count());
-            }
-            nonce++;
+            bool first = blocksCandidates.at(i).mine(mined);
+
+            if (first)
+                blocks.push_back(blocksCandidates.at(i));
         }
+
         allTime += blockTimer.Stop();
-        cout << std::string(100, ' ') << endl; // to remove last line
 
-        this->blocks.emplace_back(guess, prevHash, timestamp, version, merkleHash, nonce, difficulty, txsToBlock);
-
-        cout << setw(15) << left << "Target:" << setw(64) << right << target << setw(15) << left << "" << setw(18) << left << "Difficulty: " << setw(20) << right << difficulty << endl;
-        cout << setw(15) << left << "Guess:" << setw(64) << right << guess << setw(15) << left << "" << setw(18) << left << "Nonce:" << setw(20) << right << nonce << endl;
-        cout << setw(15) << left << "Prev hash:" << setw(64) << right << prevHash << setw(15) << left << "" << setw(18) << left << "Transaction count:" << setw(20) << right << txsToBlock.size() << endl;
-        cout << setw(15) << left << "Merkle hash:" << setw(64) << right << merkleHash << setw(15) << left << "" << setw(18) << left << "Time stamp:" << setw(20) << right << timestamp << endl;
-        cout << endl;
-        cout << "-----------------------------------------------------" << endl;
-
-        nonce = 0;
-        allTransactions.erase(allTransactions.begin() + pos, allTransactions.begin() + pos + count);
-        for (auto &tx : txsToBlock)
-        {
-            for (auto &in : tx.getInputs())
-                users.at(in.userPK).updateBalance(in.amount);
-            for (auto &out : tx.getOutputs())
-                users.at(out.userPK).updateBalance(out.amount * -1);
-        }
+        this->printFormatedBlockInfo(blocks.back());
+        this->removeAddedTransactions(blocks.back().getAllTransactions());
+        this->updateUsersBalances(blocks.back().getAllTransactions());
     }
     cout << "Average block mine time: " << programTimer.Stop() / this->blocks.size() << endl;
     this->printBlocksToFile();
     this->printUsersToFile(users);
 }
-vector<Transaction> Client::getAllTransactions()
+void Client::loadAllTransactions()
 {
     File file;
     stringstream txSS = file.readFile("../txt_files/transactions.txt");
-
-    vector<Transaction> transactions;
 
     string tempIn, tempOut, txID;
     std::stringstream inputs, outputs;
@@ -98,11 +66,9 @@ vector<Transaction> Client::getAllTransactions()
         inputs.clear();
         outputs.clear();
     }
-    return transactions;
 }
-unordered_map<string, User> Client::getAllUsers()
+void Client::loadAllUsers()
 {
-    std::unordered_map<string, User> users;
     File file;
     stringstream usersSS = file.readFile("users.txt");
 
@@ -114,21 +80,6 @@ unordered_map<string, User> Client::getAllUsers()
     {
         users.insert(std::make_pair(publicKey, User(name, publicKey, balance)));
     }
-    return users;
-};
-
-string Client::getTargetHash(int difficulty)
-{
-    string target(64, 'f');
-
-    int zeroCount = difficulty / 16;
-    int lastLet = 16 - difficulty % 16;
-
-    for (int i = 0; i < zeroCount; i++)
-        target[i] = '0';
-    if (lastLet != 16)
-        target[zeroCount] = symbols[lastLet];
-    return target;
 };
 void Client::printBlocksToFile()
 {
@@ -212,18 +163,7 @@ void Client::getBlockCount()
 void Client::getBlockInfo(int pos)
 {
     Block block = this->readBlocksFromFile().at(pos);
-
-    cout << endl;
-    cout << string(150, '-') << endl;
-    cout << endl;
-
-    cout << setw(15) << left << "Hash:" << setw(64) << right << block.getBlockHash() << setw(15) << left << "" << setw(18) << left << "Nonce:" << setw(20) << right << block.getNonce() << endl;
-    cout << setw(15) << left << "Prev hash:" << setw(64) << right << block.getPrevHash() << setw(15) << left << "" << setw(18) << left << "Transaction count:" << setw(20) << right << block.getTransactionCount() << endl;
-    cout << setw(15) << left << "Merkle hash:" << setw(64) << right << block.getMekleRootHash() << setw(15) << left << "" << setw(18) << left << "Time stamp:" << setw(20) << right << block.getTimestamp() << endl;
-    cout << setw(15) << left << "" << setw(64) << right << "" << setw(15) << left << "" << setw(18) << left << "Difficulty:" << setw(20) << right << block.getDifficulty() << endl;
-    cout << endl;
-    cout << string(150, '-') << endl;
-    cout << endl;
+    this->printFormatedBlockInfo(block);
 };
 void Client::printUsersToFile(unordered_map<string, User> users)
 {
@@ -243,6 +183,9 @@ void Client::validateTransactions(vector<Transaction> &txs)
     {
         if (!(*it).isTransactionValid())
         {
+            string txId = (*it).getTxID();
+            transactions.erase(std::find_if(transactions.begin(), transactions.end(), [txId](const Transaction &tx)
+                                            { return tx.getTxID() == txId; }));
             txs.erase(it);
             it--;
         }
@@ -250,7 +193,89 @@ void Client::validateTransactions(vector<Transaction> &txs)
 };
 void Client::ajustDifficulty()
 {
-    difficulty += targetTime - allTime / this->blocks.size();
+    if (this->blocks.size() > 0)
+        difficulty += targetTime - allTime / this->blocks.size();
     if (difficulty < 0)
         difficulty = 0;
 }
+vector<Transaction> Client::getRandomNumberOfValidTransactions()
+{
+    int count = transactions.size() >= 100 ? gen.genInt(1, 100) : transactions.size();
+    int pos = gen.genInt(0, transactions.size() - count);
+
+    vector<Transaction> transactionsToBlock(transactions.begin() + pos, transactions.begin() + pos + count);
+    this->validateTransactions(transactionsToBlock);
+
+    return transactionsToBlock;
+};
+string Client::getMerkleRootHash(vector<Transaction> validTransactionsToBlock)
+{
+    MerkleTree *merkleBuilder = new MerkleTree();
+    for (auto &el : validTransactionsToBlock)
+        merkleBuilder->addTransaction(el.getTxID());
+    merkleBuilder->genMerkelTree();
+    return merkleBuilder->getRootHash();
+};
+string Client::getTimestampAsString()
+{
+    return std::to_string(std::chrono::system_clock::now().time_since_epoch().count());
+};
+string Client::getPrevBlockHash()
+{
+    return this->blocks.empty() ? "0000000000000000000000000000000000000000000000000000000000000000" : this->blocks.back().getBlockHash();
+}
+void Client::printFormatedBlockInfo(Block &block)
+{
+    cout << endl;
+    cout << string(150, '-') << endl;
+    cout << endl;
+
+    cout << setw(15) << left << "Hash:" << setw(64) << right << block.getBlockHash() << setw(15) << left << "" << setw(18) << left << "Nonce:" << setw(20) << right << block.getNonce() << endl;
+    cout << setw(15) << left << "Prev hash:" << setw(64) << right << block.getPrevHash() << setw(15) << left << "" << setw(18) << left << "Transaction count:" << setw(20) << right << block.getTransactionCount() << endl;
+    cout << setw(15) << left << "Merkle hash:" << setw(64) << right << block.getMekleRootHash() << setw(15) << left << "" << setw(18) << left << "Time stamp:" << setw(20) << right << block.getTimestamp() << endl;
+    cout << setw(15) << left << "" << setw(64) << right << "" << setw(15) << left << "" << setw(18) << left << "Difficulty:" << setw(20) << right << block.getDifficulty() << endl;
+
+    cout << endl;
+    cout << string(150, '-') << endl;
+    cout << endl;
+};
+void Client::updateUsersBalances(vector<Transaction> &transactionsToBlock)
+{
+    for (auto &tx : transactionsToBlock)
+    {
+        for (auto &in : tx.getInputs())
+            users.at(in.userPK).updateBalance(in.amount);
+        for (auto &out : tx.getOutputs())
+            users.at(out.userPK).updateBalance(out.amount * -1);
+    }
+}
+void Client::removeAddedTransactions(vector<Transaction> &transactionsToBlock)
+{
+    for (auto const &transaction : transactionsToBlock)
+    {
+        string txIdToDelete = transaction.getTxID();
+        transactions.erase(std::remove_if(transactions.begin(), transactions.end(), [txIdToDelete](const Transaction &tx)
+                                          { return tx.getTxID() == txIdToDelete; }),
+                           transactions.end());
+    }
+};
+vector<Block> Client::createBlockCandidates(int count)
+{
+    string version = "1";
+    string prevHash = this->getPrevBlockHash();
+
+    vector<Block> candidates;
+    candidates.reserve(count);
+    this->ajustDifficulty();
+
+    for (int i = 0; i < count; i++)
+    {
+        vector<Transaction> transactionsToBlock(getRandomNumberOfValidTransactions());
+        string merkleHash = this->getMerkleRootHash(transactionsToBlock);
+        string timestamp = this->getTimestampAsString();
+
+        candidates.emplace_back(prevHash, timestamp, version, merkleHash, this->difficulty, transactionsToBlock);
+    }
+
+    return candidates;
+};

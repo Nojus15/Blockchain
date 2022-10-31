@@ -28,7 +28,7 @@ public:
     void setTxID(string id);
     void addInput(string senderPK, int amount);
     void addOutput(string recieverPK, int amount);
-    string getTxID();
+    string getTxID() const;
     vector<Operation> getInputs();
     vector<Operation> getOutputs();
 

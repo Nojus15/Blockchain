@@ -18,7 +18,7 @@ void Transaction::addOutput(string recieverPK, int amount)
 {
     this->out.emplace_back(recieverPK, amount);
 };
-string Transaction::getTxID()
+string Transaction::getTxID() const
 {
     return this->txID;
 };

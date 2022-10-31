@@ -37,9 +37,9 @@ void Application::processMode()
         break;
 
     case AppMode::Mine:
-        if (this->argc != 2)
+        if (this->argc != 3)
             throw std::invalid_argument("Invalid argument: --mine used incorrectly");
-        cli.startMining();
+        cli.startMining(std::atoi(argv[2]));
         break;
 
     case AppMode::GetBlockCount:
