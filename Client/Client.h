@@ -51,7 +51,7 @@ class Client
 
     void ajustDifficulty();
 
-    int difficulty = 0;
+    int difficulty = 20;
     double allTime = 0;
 
 public:
