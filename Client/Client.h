@@ -21,7 +21,8 @@ using std::stringstream;
 using std::unordered_map;
 using std::vector;
 
-const static int targetTime = 3;
+// block creation target time in seconds
+const static double targetTime = 0.5;
 
 class Client
 {

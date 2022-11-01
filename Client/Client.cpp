@@ -97,7 +97,7 @@ void Client::printBlocksToFile()
     stringstream os;
     for (auto &block : this->blocks)
     {
-        os << block.getBlockHash() << " " << block.getMekleRootHash() << " " << block.getPrevHash() << " " << block.getDifficulty() << " " << block.getTimestamp() << " " << block.getNonce() << " " << block.getVersion() << " " << block.getTransactionCount() << endl;
+        os << block.getBlockHash() << " " << block.getMekleRootHash() << " " << block.getPrevHash() << " " << block.getDifficulty() << " " << block.getTimestamp() << " " << block.getNonce() << " " << block.getVersion() << " " << block.getMinedThreadNumber() << endl;
         for (auto &tx : block.getAllTransactions())
         {
             os << tx.getTxID() << endl;
@@ -137,10 +137,10 @@ vector<Block> Client::readBlocksFromFile()
         stringstream line(blockInfo);
 
         string hash, prevHash, timestamp, version, merkleRootHash;
-        int nonce, difficulty;
+        int nonce, difficulty, threadNr;
         vector<Transaction> transactions;
 
-        line >> hash >> merkleRootHash >> prevHash >> difficulty >> timestamp >> nonce >> version;
+        line >> hash >> merkleRootHash >> prevHash >> difficulty >> timestamp >> nonce >> version >> threadNr;
         while (blocksSS)
         {
             getline(blocksSS, temp);
@@ -162,7 +162,7 @@ vector<Block> Client::readBlocksFromFile()
 
         inputs.clear();
         outputs.clear();
-        blocks.emplace_back(hash, prevHash, timestamp, version, merkleRootHash, nonce, difficulty, transactions);
+        blocks.emplace_back(hash, prevHash, timestamp, version, merkleRootHash, nonce, difficulty, transactions, threadNr);
     }
     return blocks;
 };

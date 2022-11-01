@@ -42,7 +42,7 @@ private:
     void calcTimestamp();
 
 public:
-    Block(string hash, string prevHash, string timestamp, string version, string merkleRootHash, int nonce, int difficulty, vector<Transaction> &transactions);
+    Block(string hash, string prevHash, string timestamp, string version, string merkleRootHash, int nonce, int difficulty, vector<Transaction> &transactions, int threadNr);
     Block(string prevHash, string version, int difficulty, vector<Transaction> &transactions);
     string getBlockHash();
     string getPrevHash();

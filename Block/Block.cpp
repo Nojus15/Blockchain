@@ -1,6 +1,6 @@
 #include "Block.h"
 
-Block::Block(string hash, string prevHash, string timestamp, string version, string merkleRootHash, int nonce, int difficulty, vector<Transaction> &transactions)
+Block::Block(string hash, string prevHash, string timestamp, string version, string merkleRootHash, int nonce, int difficulty, vector<Transaction> &transactions, int threadNr)
 {
     this->hash = hash;
     this->prevHash = prevHash;
@@ -10,6 +10,7 @@ Block::Block(string hash, string prevHash, string timestamp, string version, str
     this->nonce = nonce;
     this->difficulty = difficulty;
     this->transactions = transactions;
+    this->threadNumber = threadNr;
 }
 Block::Block(string prevHash, string version, int difficulty, vector<Transaction> &transactions)
 {
