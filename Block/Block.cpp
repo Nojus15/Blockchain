@@ -13,16 +13,12 @@ Block::Block(string hash, string prevHash, string timestamp, string version, str
 }
 Block::Block(string prevHash, string version, int difficulty, vector<Transaction> &transactions)
 {
-    cout << "Constructing block with " << transactions.size() << " transactions" << endl;
     this->prevHash = prevHash;
     this->version = version;
     this->difficulty = difficulty;
-    cout << "Setting transactions" << endl;
     this->transactions = transactions;
-    cout << "Transactions set" << endl;
     this->nonce = 0;
     this->calcMerkleHash();
-    cout << "Merkle calculated" << endl;
     this->calcTimestamp();
 };
 
