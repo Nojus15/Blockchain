@@ -73,6 +73,9 @@ void Generator::genTransactionsFile(int count)
 
     vector<Transaction> txs(count);
 
+    Timer timer;
+    timer.Start();
+
     for (int i = 0; i < count; i++)
     {
         sender = &users.at(this->genInt(0, userCount));
@@ -105,6 +108,7 @@ void Generator::genTransactionsFile(int count)
         string txIdToHash = sender->getPublicKey() + to_string(sender->getBalance()) + sender->getPublicKey() + to_string((sender->getBalance() - amount)) + reciever->getPublicKey() + to_string(amount);
         tx->setTxID(this->hasher.hashString(txIdToHash));
     }
+    cout << "Transaction generation time: " << timer.Stop() << "s" << endl;
 
     stringstream os;
 

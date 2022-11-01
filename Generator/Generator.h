@@ -8,6 +8,7 @@
 #include <string>
 #include <cstring>
 #include "../File/File.h"
+#include "../Timer/Timer.h"
 #include "../Hasher/Hasher.h"
 #include "../User/User.h"
 #include "../Transaction/Transaction.h"
