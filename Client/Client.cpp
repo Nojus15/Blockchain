@@ -190,18 +190,12 @@ void Client::validateTransactions(vector<Transaction> &txs)
             User *user = &users.at(input.userPK);
 
             if (user->imaginaryBalance == -1)
-            {
-                // cout << "Setting imaginary balance for user: " << user->getPublicKey() << endl;
                 user->imaginaryBalance = user->getBalance();
-            }
 
             if (user->imaginaryBalance < input.amount)
                 userCanMakeTransaction = false;
             else
                 user->imaginaryBalance -= input.amount;
-
-            // cout << "User " << user->getPublicKey() << " imaginary balance: " << user->imaginaryBalance << endl;
-            // cout << endl;
         }
 
         if (!(*it).isTransactionHashValid() || !userCanMakeTransaction)
