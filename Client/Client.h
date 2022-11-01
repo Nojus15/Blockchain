@@ -3,7 +3,6 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <iomanip>
 #include <unordered_map>
 #include <algorithm>
 #include "../Block/Block.h"
@@ -17,10 +16,7 @@
 using std::cout;
 using std::end;
 using std::getline;
-using std::left;
 using std::remove;
-using std::right;
-using std::setw;
 using std::string;
 using std::stringstream;
 using std::unordered_map;
@@ -53,7 +49,6 @@ class Client
     void updateUsersBalances(vector<Transaction> &transactionsToBlock);
     void removeAddedTransactions(vector<Transaction> &transactionsToBlock);
 
-    void printFormatedBlockInfo(Block &block);
     vector<Block> createBlockCandidates(int count);
 
     int difficulty = 20;

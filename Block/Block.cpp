@@ -119,3 +119,19 @@ void Block::calcTimestamp()
 {
     timestamp = std::to_string(std::chrono::system_clock::now().time_since_epoch().count());
 };
+void Block::printFormatedBlockInfo()
+{
+    cout << endl;
+    cout << string(150, '-') << endl;
+    cout << endl;
+
+    cout << setw(15) << left << "Hash:" << setw(64) << right << hash << setw(15) << left << "" << setw(20) << left << "Nonce:" << setw(20) << right << nonce << endl;
+    cout << setw(15) << left << "Prev hash:" << setw(64) << right << prevHash << setw(15) << left << "" << setw(20) << left << "Transaction count:" << setw(20) << right << transactions.size() << endl;
+    cout << setw(15) << left << "Merkle hash:" << setw(64) << right << merkleRootHash << setw(15) << left << "" << setw(20) << left << "Time stamp:" << setw(20) << right << timestamp << endl;
+    cout << setw(15) << left << "Target hash:" << setw(64) << right << calcDifficultyTargetHash() << setw(15) << left << "" << setw(20) << left << "Difficulty:" << setw(20) << right << difficulty << endl;
+    cout << setw(15) << left << "" << setw(64) << right << "" << setw(15) << left << "" << setw(20) << left << "Mined by thread nr:" << setw(20) << right << threadNumber << endl;
+
+    cout << endl;
+    cout << string(150, '-') << endl;
+    cout << endl;
+};

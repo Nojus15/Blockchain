@@ -33,7 +33,7 @@ void Client::startMining(int numberOfThreads)
 
             allTime += blockTimer.Stop();
 
-            this->printFormatedBlockInfo(blocks.back());
+            blocks.back().printFormatedBlockInfo();
             this->removeAddedTransactions(blocks.back().getAllTransactions());
             this->updateUsersBalances(blocks.back().getAllTransactions());
         }
@@ -174,7 +174,7 @@ void Client::getBlockCount()
 void Client::getBlockInfo(int pos)
 {
     Block block = this->readBlocksFromFile().at(pos);
-    this->printFormatedBlockInfo(block);
+    block.printFormatedBlockInfo();
 };
 void Client::printUsersToFile(unordered_map<string, User> users)
 {
@@ -230,22 +230,6 @@ string Client::getPrevBlockHash()
 {
     return this->blocks.empty() ? "0000000000000000000000000000000000000000000000000000000000000000" : this->blocks.back().getBlockHash();
 }
-void Client::printFormatedBlockInfo(Block &block)
-{
-    cout << endl;
-    cout << string(150, '-') << endl;
-    cout << endl;
-
-    cout << setw(15) << left << "Hash:" << setw(64) << right << block.getBlockHash() << setw(15) << left << "" << setw(20) << left << "Nonce:" << setw(20) << right << block.getNonce() << endl;
-    cout << setw(15) << left << "Prev hash:" << setw(64) << right << block.getPrevHash() << setw(15) << left << "" << setw(20) << left << "Transaction count:" << setw(20) << right << block.getTransactionCount() << endl;
-    cout << setw(15) << left << "Merkle hash:" << setw(64) << right << block.getMekleRootHash() << setw(15) << left << "" << setw(20) << left << "Time stamp:" << setw(20) << right << block.getTimestamp() << endl;
-    cout << setw(15) << left << "Target hash:" << setw(64) << right << block.calcDifficultyTargetHash() << setw(15) << left << "" << setw(20) << left << "Difficulty:" << setw(20) << right << block.getDifficulty() << endl;
-    cout << setw(15) << left << "" << setw(64) << right << "" << setw(15) << left << "" << setw(20) << left << "Mined by thread nr:" << setw(20) << right << block.getMinedThreadNumber() << endl;
-
-    cout << endl;
-    cout << string(150, '-') << endl;
-    cout << endl;
-};
 void Client::updateUsersBalances(vector<Transaction> &transactionsToBlock)
 {
     for (auto &tx : transactionsToBlock)

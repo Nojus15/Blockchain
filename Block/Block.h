@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <iomanip>
 
 #include "../Transaction/Transaction.h"
 #include "../Hasher/Hasher.h"
@@ -10,6 +11,9 @@
 
 #include <omp.h>
 
+using std::left;
+using std::right;
+using std::setw;
 using std::string;
 using std::to_string;
 using std::vector;
@@ -54,4 +58,5 @@ public:
     int getMinedThreadNumber();
 
     bool mine(bool &isMined);
+    void printFormatedBlockInfo();
 };
