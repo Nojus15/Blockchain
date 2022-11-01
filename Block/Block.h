@@ -2,8 +2,12 @@
 
 #include <iostream>
 #include <vector>
+#include <chrono>
+
 #include "../Transaction/Transaction.h"
 #include "../Hasher/Hasher.h"
+#include "../MerkleTree/MerkleTree.h"
+
 #include <omp.h>
 
 using std::string;
@@ -30,9 +34,12 @@ private:
 
     int threadNumber = -1;
 
+    void calcMerkleHash();
+    void calcTimestamp();
+
 public:
-    Block(string hash, string prevHash, string timestamp, string version, string merkleRootHash, int nonce, int difficulty, vector<Transaction> transactions);
-    Block(string prevHash, string timestamp, string version, string merkleRootHash, int difficulty, vector<Transaction> transactions);
+    Block(string hash, string prevHash, string timestamp, string version, string merkleRootHash, int nonce, int difficulty, vector<Transaction> &transactions);
+    Block(string prevHash, string version, int difficulty, vector<Transaction> &transactions);
     string getBlockHash();
     string getPrevHash();
     string getTimestamp();

@@ -2,38 +2,49 @@
 
 void Client::startMining(int numberOfThreads)
 {
-    this->loadAllTransactions();
-    this->loadAllUsers();
-    cout << users.size() << endl;
-
-    programTimer.Start();
-    while (transactions.size() > 0)
+    try
     {
-        vector<Block> blocksCandidates(this->createBlockCandidates(numberOfThreads));
+        this->loadAllTransactions();
+        this->loadAllUsers();
+        cout << users.size() << endl;
 
-        bool mined = false;
-        blockTimer.Start();
-
-        omp_set_dynamic(0);
-        omp_set_num_threads(numberOfThreads);
-#pragma omp parallel for
-        for (int i = 0; i < numberOfThreads; i++)
+        programTimer.Start();
+        while (transactions.size() > 0)
         {
-            bool first = blocksCandidates.at(i).mine(mined);
+            // cout << "Generating blocks candidates" << endl;
+            vector<Block> blocksCandidates(this->createBlockCandidates(numberOfThreads));
+            // cout << "Blocks candidates generated" << endl;
 
-            if (first)
-                blocks.push_back(blocksCandidates.at(i));
+            bool mined = false;
+            blockTimer.Start();
+
+            omp_set_dynamic(0);
+            omp_set_num_threads(numberOfThreads);
+#pragma omp parallel for
+            for (int i = 0; i < numberOfThreads; i++)
+            {
+                bool first = blocksCandidates.at(i).mine(mined);
+
+                if (first)
+                    blocks.push_back(blocksCandidates.at(i));
+            }
+            // cout << "Block found" << endl;
+            blocksCandidates.clear();
+
+            allTime += blockTimer.Stop();
+
+            this->printFormatedBlockInfo(blocks.back());
+            this->removeAddedTransactions(blocks.back().getAllTransactions());
+            this->updateUsersBalances(blocks.back().getAllTransactions());
         }
-
-        allTime += blockTimer.Stop();
-
-        this->printFormatedBlockInfo(blocks.back());
-        this->removeAddedTransactions(blocks.back().getAllTransactions());
-        this->updateUsersBalances(blocks.back().getAllTransactions());
+        cout << "Average block mine time: " << programTimer.Stop() / this->blocks.size() << endl;
+        this->printBlocksToFile();
+        this->printUsersToFile(users);
     }
-    cout << "Average block mine time: " << programTimer.Stop() / this->blocks.size() << endl;
-    this->printBlocksToFile();
-    this->printUsersToFile(users);
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << '\n';
+    }
 }
 void Client::loadAllTransactions()
 {
@@ -215,18 +226,6 @@ vector<Transaction> Client::getRandomNumberOfValidTransactions()
 
     return transactionsToBlock;
 };
-string Client::getMerkleRootHash(vector<Transaction> validTransactionsToBlock)
-{
-    MerkleTree *merkleBuilder = new MerkleTree();
-    for (auto &el : validTransactionsToBlock)
-        merkleBuilder->addTransaction(el.getTxID());
-    merkleBuilder->genMerkelTree();
-    return merkleBuilder->getRootHash();
-};
-string Client::getTimestampAsString()
-{
-    return std::to_string(std::chrono::system_clock::now().time_since_epoch().count());
-};
 string Client::getPrevBlockHash()
 {
     return this->blocks.empty() ? "0000000000000000000000000000000000000000000000000000000000000000" : this->blocks.back().getBlockHash();
@@ -273,16 +272,12 @@ vector<Block> Client::createBlockCandidates(int count)
     string prevHash = this->getPrevBlockHash();
 
     vector<Block> candidates;
-    candidates.reserve(count);
     this->ajustDifficulty();
 
     for (int i = 0; i < count; i++)
     {
         vector<Transaction> transactionsToBlock(getRandomNumberOfValidTransactions());
-        string merkleHash = this->getMerkleRootHash(transactionsToBlock);
-        string timestamp = this->getTimestampAsString();
-
-        candidates.emplace_back(prevHash, timestamp, version, merkleHash, this->difficulty, transactionsToBlock);
+        candidates.emplace_back(prevHash, version, this->difficulty, transactionsToBlock);
     }
 
     return candidates;

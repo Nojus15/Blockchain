@@ -3,8 +3,6 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <chrono>
-#include <ctime>
 #include <iomanip>
 #include <unordered_map>
 #include <algorithm>
@@ -13,7 +11,6 @@
 #include "../Transaction/Transaction.h"
 #include "../Generator/Generator.h"
 #include "../File/File.h"
-#include "../MerkleTree/MerkleTree.h"
 #include "../Timer/Timer.h"
 #include <omp.h>
 
@@ -52,7 +49,6 @@ class Client
     vector<Transaction> getRandomNumberOfValidTransactions();
     void validateTransactions(vector<Transaction> &txs);
     string getMerkleRootHash(vector<Transaction> validTransactionsToBlock);
-    string getTimestampAsString();
     string getPrevBlockHash();
     void updateUsersBalances(vector<Transaction> &transactionsToBlock);
     void removeAddedTransactions(vector<Transaction> &transactionsToBlock);

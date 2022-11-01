@@ -1,6 +1,6 @@
 #include "Block.h"
 
-Block::Block(string hash, string prevHash, string timestamp, string version, string merkleRootHash, int nonce, int difficulty, vector<Transaction> transactions)
+Block::Block(string hash, string prevHash, string timestamp, string version, string merkleRootHash, int nonce, int difficulty, vector<Transaction> &transactions)
 {
     this->hash = hash;
     this->prevHash = prevHash;
@@ -11,15 +11,19 @@ Block::Block(string hash, string prevHash, string timestamp, string version, str
     this->difficulty = difficulty;
     this->transactions = transactions;
 }
-Block::Block(string prevHash, string timestamp, string version, string merkleRootHash, int difficulty, vector<Transaction> transactions)
+Block::Block(string prevHash, string version, int difficulty, vector<Transaction> &transactions)
 {
+    cout << "Constructing block with " << transactions.size() << " transactions" << endl;
     this->prevHash = prevHash;
-    this->timestamp = timestamp;
     this->version = version;
-    this->merkleRootHash = merkleRootHash;
     this->difficulty = difficulty;
+    cout << "Setting transactions" << endl;
     this->transactions = transactions;
+    cout << "Transactions set" << endl;
     this->nonce = 0;
+    this->calcMerkleHash();
+    cout << "Merkle calculated" << endl;
+    this->calcTimestamp();
 };
 
 string Block::getBlockHash()
@@ -103,4 +107,19 @@ bool Block::mine(bool &isMined)
     }
 
     return false;
+};
+
+void Block::calcMerkleHash()
+{
+    MerkleTree *merkleBuilder = new MerkleTree();
+
+    for (auto &el : transactions)
+        merkleBuilder->addTransaction(el.getTxID());
+
+    merkleBuilder->genMerkelTree();
+    merkleRootHash = merkleBuilder->getRootHash();
+};
+void Block::calcTimestamp()
+{
+    timestamp = std::to_string(std::chrono::system_clock::now().time_since_epoch().count());
 };

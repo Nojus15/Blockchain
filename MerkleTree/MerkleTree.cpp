@@ -11,6 +11,13 @@ void MerkleTree::addTransaction(string tx)
 // };
 void MerkleTree::genMerkelTree()
 {
+    if (this->leaves.size() == 0)
+    {
+        string hash(64, '0');
+        this->root = new Node(hash);
+        return;
+    }
+
     vector<Node *> botLine;
     for (auto &el : this->leaves)
         botLine.push_back(el.second);
