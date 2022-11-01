@@ -122,7 +122,6 @@ vector<Block> Client::readBlocksFromFile()
     vector<Block> blocks;
 
     string temp, blockInfo;
-    std::stringstream inputs, outputs;
     string userPK;
     int amount;
 
@@ -148,20 +147,21 @@ vector<Block> Client::readBlocksFromFile()
                 break;
 
             t = new Transaction(temp);
+
             getline(blocksSS, temp);
-            inputs << temp;
+            stringstream inputs(temp);
+
             getline(blocksSS, temp);
-            outputs << temp;
+            stringstream outputs(temp);
 
             while (inputs >> userPK && inputs >> amount)
                 t->addInput(userPK, amount);
             while (outputs >> userPK && outputs >> amount)
                 t->addOutput(userPK, amount);
+
             transactions.push_back(*t);
         }
 
-        inputs.clear();
-        outputs.clear();
         blocks.emplace_back(hash, prevHash, timestamp, version, merkleRootHash, nonce, difficulty, transactions, threadNr);
     }
     return blocks;
