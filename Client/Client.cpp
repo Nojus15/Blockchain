@@ -2,49 +2,41 @@
 
 void Client::startMining(int numberOfThreads)
 {
-    try
+    this->loadAllTransactions();
+    this->loadAllUsers();
+
+    programTimer.Start();
+    while (transactions.size() > 0)
     {
-        this->loadAllTransactions();
-        this->loadAllUsers();
-        cout << users.size() << endl;
+        vector<Block> blocksCandidates(this->createBlockCandidates(numberOfThreads));
 
-        programTimer.Start();
-        while (transactions.size() > 0)
-        {
-            // cout << "Generating blocks candidates" << endl;
-            vector<Block> blocksCandidates(this->createBlockCandidates(numberOfThreads));
-            // cout << "Blocks candidates generated" << endl;
+        bool mined = false;
+        blockTimer.Start();
 
-            bool mined = false;
-            blockTimer.Start();
-
-            omp_set_dynamic(0);
-            omp_set_num_threads(numberOfThreads);
+        omp_set_dynamic(0);
+        omp_set_num_threads(numberOfThreads);
 #pragma omp parallel for
-            for (int i = 0; i < numberOfThreads; i++)
-            {
-                bool first = blocksCandidates.at(i).mine(mined);
+        for (int i = 0; i < numberOfThreads; i++)
+        {
+            bool first = blocksCandidates.at(i).mine(mined);
 
-                if (first)
-                    blocks.push_back(blocksCandidates.at(i));
-            }
-            // cout << "Block found" << endl;
-            blocksCandidates.clear();
-
-            allTime += blockTimer.Stop();
-
-            blocks.back().printFormatedBlockInfo();
-            this->removeAddedTransactions(blocks.back().getAllTransactions());
-            this->updateUsersBalances(blocks.back().getAllTransactions());
+            if (first)
+                blocks.push_back(blocksCandidates.at(i));
         }
-        cout << "Average block mine time: " << programTimer.Stop() / this->blocks.size() << endl;
-        this->printBlocksToFile();
-        this->printUsersToFile(users);
+
+        cout << string(200, ' ') << endl; // to override last line
+
+        allTime += blockTimer.Stop();
+
+        blocks.back().printFormatedBlockInfo();
+        this->removeAddedTransactions(blocks.back().getAllTransactions());
+        this->updateUsersBalances(blocks.back().getAllTransactions());
     }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << '\n';
-    }
+    double programTime = programTimer.Stop();
+    cout << "Average block mine time: " << programTime / this->blocks.size() << endl;
+    cout << "All program time: " << programTime << endl;
+    this->printBlocksToFile();
+    this->printUsersToFile(users);
 }
 void Client::loadAllTransactions()
 {
@@ -195,8 +187,21 @@ void Client::validateTransactions(vector<Transaction> &txs)
         bool userCanMakeTransaction = true;
         for (auto &input : (*it).getInputs())
         {
-            if (users.at(input.userPK).getBalance() < input.amount)
+            User *user = &users.at(input.userPK);
+
+            if (user->imaginaryBalance == -1)
+            {
+                // cout << "Setting imaginary balance for user: " << user->getPublicKey() << endl;
+                user->imaginaryBalance = user->getBalance();
+            }
+
+            if (user->imaginaryBalance < input.amount)
                 userCanMakeTransaction = false;
+            else
+                user->imaginaryBalance -= input.amount;
+
+            // cout << "User " << user->getPublicKey() << " imaginary balance: " << user->imaginaryBalance << endl;
+            // cout << endl;
         }
 
         if (!(*it).isTransactionHashValid() || !userCanMakeTransaction)
@@ -212,7 +217,7 @@ void Client::validateTransactions(vector<Transaction> &txs)
 void Client::ajustDifficulty()
 {
     if (this->blocks.size() > 0)
-        difficulty += targetTime - allTime / this->blocks.size();
+        difficulty += targetTime - floor(allTime / this->blocks.size());
     if (difficulty < 0)
         difficulty = 0;
 }
@@ -235,9 +240,9 @@ void Client::updateUsersBalances(vector<Transaction> &transactionsToBlock)
     for (auto &tx : transactionsToBlock)
     {
         for (auto &in : tx.getInputs())
-            users.at(in.userPK).updateBalance(in.amount);
+            users.at(in.userPK).updateBalance(in.amount * -1);
         for (auto &out : tx.getOutputs())
-            users.at(out.userPK).updateBalance(out.amount * -1);
+            users.at(out.userPK).updateBalance(out.amount);
     }
 }
 void Client::removeAddedTransactions(vector<Transaction> &transactionsToBlock)
@@ -265,4 +270,56 @@ vector<Block> Client::createBlockCandidates(int count)
     }
 
     return candidates;
+};
+
+void Client::getBestHashBlock()
+{
+    vector<Block> blocks(this->readBlocksFromFile());
+
+    string minHash(blocks.at(0).getBlockHash()), blockHash;
+    Block *minHashBlock;
+
+    for (auto it = blocks.begin(); it != blocks.end(); it++)
+    {
+        blockHash = (*it).getBlockHash();
+        if (blockHash < minHash)
+        {
+            minHash = blockHash;
+            minHashBlock = &(*it);
+        }
+    }
+    minHashBlock->printFormatedBlockInfo();
+};
+void Client::getHardestBlock()
+{
+    vector<Block> blocks(this->readBlocksFromFile());
+
+    int nonce, maxNonce = -1;
+    Block *maxNonceBlock;
+
+    for (auto it = blocks.begin(); it != blocks.end(); it++)
+    {
+        nonce = (*it).getNonce();
+        if (nonce > maxNonce)
+        {
+            maxNonce = nonce;
+            maxNonceBlock = &(*it);
+        }
+    }
+    maxNonceBlock->printFormatedBlockInfo();
+};
+void Client::getAverageDifficulty()
+{
+    vector<Block> blocks(this->readBlocksFromFile());
+
+    int avgDifficulty = 0;
+
+    for (auto &block : blocks)
+    {
+        avgDifficulty += block.getDifficulty();
+    }
+    cout << "Average difficulty: " << avgDifficulty << endl;
+};
+void Client::getBlockTransaction(int blockPos, int transactionPos){
+
 };

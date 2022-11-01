@@ -17,6 +17,10 @@ enum AppMode
     Mine,
     GetBlockCount,
     GetBlockInfo,
+    GetBestHashBlock,
+    GetHardestBlock,
+    GetAverageDifficulty,
+    GetBlockTransaction,
 };
 
 class Application

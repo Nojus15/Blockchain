@@ -94,6 +94,8 @@ bool Block::mine(bool &isMined)
     while (!isMined && target < (hash = hasher.hashString(prevHash + timestamp + version + to_string(nonce) + merkleRootHash + to_string(difficulty))))
     {
         nonce++;
+        if (nonce % 500 == 0)
+            cout << "Thread: " << omp_get_thread_num() << " Nonce: " << nonce << " Target: " << target << " Currend guess: " << hash << '\r';
     }
 
     if (!isMined && hash < target)

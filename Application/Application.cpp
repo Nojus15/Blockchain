@@ -54,7 +54,32 @@ void Application::processMode()
         cli.getBlockInfo(std::atoi(argv[2]));
         break;
 
+    case AppMode::GetBestHashBlock:
+        if (this->argc != 2)
+            throw std::invalid_argument("Invalid argument: --getBeshHashBlock used incorrectly");
+        cli.getBestHashBlock();
+        break;
+
+    case AppMode::GetHardestBlock:
+        if (this->argc != 2)
+            throw std::invalid_argument("Invalid argument: --getHardestBlock used incorrectly");
+        cli.getHardestBlock();
+        break;
+
+    case AppMode::GetAverageDifficulty:
+        if (this->argc != 2)
+            throw std::invalid_argument("Invalid argument: --getAverageDifficulty used incorrectly");
+        cli.getAverageDifficulty();
+        break;
+
+    case AppMode::GetBlockTransaction:
+        if (this->argc != 4)
+            throw std::invalid_argument("Invalid argument: --getBlockTransaction used incorrectly");
+        cli.getBlockTransaction(std::atoi(argv[2]), std::atoi(argv[3]));
+        break;
+
     default:
+        throw std::invalid_argument("Mode not found");
         break;
     }
 }
@@ -85,6 +110,31 @@ void Application::findMode()
     if (modeArg == "--getBlockCount")
     {
         this->mode = AppMode::GetBlockCount;
+        return;
+    }
+    if (modeArg == "--getBlockInfo")
+    {
+        this->mode = AppMode::GetBlockInfo;
+        return;
+    }
+    if (modeArg == "--getBeshHashBlock")
+    {
+        this->mode = AppMode::GetBestHashBlock;
+        return;
+    }
+    if (modeArg == "--getHardestBlock")
+    {
+        this->mode = AppMode::GetHardestBlock;
+        return;
+    }
+    if (modeArg == "--getAverageDifficulty")
+    {
+        this->mode = AppMode::GetAverageDifficulty;
+        return;
+    }
+    if (modeArg == "--getBlockTransaction")
+    {
+        this->mode = AppMode::GetBlockTransaction;
         return;
     }
     if (modeArg == "--getBlockInfo")

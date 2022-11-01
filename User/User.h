@@ -14,6 +14,7 @@ private:
     int balance;
 
 public:
+    int imaginaryBalance = -1;
     User(string name, string pk, int bal);
 
     string getName();

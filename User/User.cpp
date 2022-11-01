@@ -38,4 +38,5 @@ void User::setBalance(int balance)
 void User::updateBalance(int balance)
 {
     this->balance += balance;
+    imaginaryBalance = -1;
 }

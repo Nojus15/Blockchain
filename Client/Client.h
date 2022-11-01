@@ -22,7 +22,7 @@ using std::unordered_map;
 using std::vector;
 
 // block creation target time in seconds
-const static double targetTime = 0.5;
+const static double targetTime = 1;
 
 class Client
 {
@@ -51,11 +51,16 @@ class Client
 
     void ajustDifficulty();
 
-    int difficulty = 20;
+    int difficulty = 0;
     double allTime = 0;
 
 public:
     void startMining(int numberOfThreads);
+
     void getBlockCount();
     void getBlockInfo(int pos);
+    void getBestHashBlock();
+    void getHardestBlock();
+    void getAverageDifficulty();
+    void getBlockTransaction(int blockPos, int transactionPos);
 };
