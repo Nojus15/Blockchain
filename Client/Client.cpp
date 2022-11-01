@@ -314,6 +314,10 @@ void Client::getAverageDifficulty()
     }
     cout << "Average difficulty: " << avgDifficulty << endl;
 };
-void Client::getBlockTransaction(int blockPos, int transactionPos){
+void Client::getBlockTransaction(int blockPos, int transactionPos)
+{
+    Block block(this->readBlocksFromFile().at(blockPos));
+    Transaction transaction(block.getAllTransactions().at(transactionPos));
 
+    transaction.printFormatedTransaction();
 };

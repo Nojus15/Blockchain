@@ -2,8 +2,12 @@
 
 #include <iostream>
 #include <vector>
+#include <iomanip>
 #include "../Hasher/Hasher.h"
 
+using std::left;
+using std::right;
+using std::setw;
 using std::string;
 using std::vector;
 
@@ -33,4 +37,6 @@ public:
     vector<Operation> getOutputs();
 
     bool isTransactionHashValid();
+
+    void printFormatedTransaction();
 };
