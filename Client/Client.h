@@ -5,13 +5,12 @@
 #include <string>
 #include <unordered_map>
 #include <algorithm>
+#include <omp.h>
 #include "../Block/Block.h"
-#include "../Hasher/Hasher.h"
 #include "../Transaction/Transaction.h"
 #include "../Generator/Generator.h"
 #include "../File/File.h"
 #include "../Timer/Timer.h"
-#include <omp.h>
 
 using std::cout;
 using std::end;
@@ -31,7 +30,6 @@ class Client
     vector<Transaction> transactions;
 
     Generator gen;
-    Hasher hasher;
     Timer blockTimer;
     Timer programTimer;
 
@@ -44,16 +42,16 @@ class Client
 
     vector<Transaction> getRandomNumberOfValidTransactions();
     void validateTransactions(vector<Transaction> &txs);
-    string getMerkleRootHash(vector<Transaction> validTransactionsToBlock);
-    string getPrevBlockHash();
-    void updateUsersBalances(vector<Transaction> &transactionsToBlock);
     void removeAddedTransactions(vector<Transaction> &transactionsToBlock);
+    void updateUsersBalances(vector<Transaction> &transactionsToBlock);
 
+    string getPrevBlockHash();
     vector<Block> createBlockCandidates(int count);
+
+    void ajustDifficulty();
 
     int difficulty = 20;
     double allTime = 0;
-    void ajustDifficulty();
 
 public:
     void startMining(int numberOfThreads);
