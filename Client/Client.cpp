@@ -1,5 +1,7 @@
 #include "Client.h"
 
+Client::Client(){};
+
 void Client::startMining(int numberOfThreads)
 {
     this->loadAllTransactions();
@@ -11,7 +13,6 @@ void Client::startMining(int numberOfThreads)
     while (transactions.size() > 0)
     {
         vector<Block> blocksCandidates(this->createBlockCandidates(numberOfThreads));
-
         bool mined = false;
         blockTimer.Start();
 
@@ -21,19 +22,19 @@ void Client::startMining(int numberOfThreads)
         for (int i = 0; i < numberOfThreads; i++)
         {
             bool first = blocksCandidates.at(i).mine(mined);
-
             if (first)
-                prevBlock = blocksCandidates.at(i);
+                prevBlock = new Block(blocksCandidates.at(i));
         }
 
         cout << string(200, ' ') << endl; // to override last line
 
+        blockCounter++;
         allTime += blockTimer.Stop();
 
-        prevBlock.appendBlockToFile();
-        prevBlock.printFormatedBlockInfo();
-        this->removeAddedTransactions(prevBlock.getAllTransactions());
-        this->updateUsersBalances(prevBlock.getAllTransactions());
+        prevBlock->appendBlockToFile();
+        prevBlock->printFormatedBlockInfo();
+        this->removeAddedTransactions(prevBlock->getAllTransactions());
+        this->updateUsersBalances(prevBlock->getAllTransactions());
     }
     double programTime = programTimer.Stop();
     cout << "Average block mine time: " << programTime / blockCounter << endl;
@@ -208,7 +209,7 @@ vector<Transaction> Client::getRandomNumberOfValidTransactions()
 };
 string Client::getPrevBlockHash()
 {
-    return blockCounter == 0 ? string(64, '0') : prevBlock.getBlockHash();
+    return blockCounter == 0 ? string(64, '0') : prevBlock->getBlockHash();
 }
 void Client::updateUsersBalances(vector<Transaction> &transactionsToBlock)
 {

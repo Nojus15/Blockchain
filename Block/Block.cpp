@@ -22,6 +22,18 @@ Block::Block(string prevHash, string version, int difficulty, vector<Transaction
     this->calcMerkleHash();
     this->calcTimestamp();
 };
+Block::Block(const Block &block)
+{
+    this->hash = block.hash;
+    this->prevHash = block.prevHash;
+    this->timestamp = block.timestamp;
+    this->version = block.version;
+    this->merkleRootHash = block.merkleRootHash;
+    this->nonce = block.nonce;
+    this->difficulty = block.difficulty;
+    this->transactions = block.transactions;
+    this->threadNumber = block.threadNumber;
+};
 
 string Block::getBlockHash()
 {
@@ -88,6 +100,7 @@ int Block::getMinedThreadNumber()
 
 bool Block::mine(bool &isMined)
 {
+    cout << "mine called" << endl;
     Hasher hasher;
     string target = this->calcDifficultyTargetHash();
 
@@ -97,6 +110,7 @@ bool Block::mine(bool &isMined)
         if (nonce % 500 == 0)
             cout << "Thread: " << omp_get_thread_num() << " Nonce: " << nonce << " Target: " << target << " Currend guess: " << hash << '\r';
     }
+    cout << "mined" << endl;
 
     if (!isMined && hash < target)
     {

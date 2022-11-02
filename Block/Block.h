@@ -45,6 +45,7 @@ private:
 public:
     Block(string hash, string prevHash, string timestamp, string version, string merkleRootHash, int nonce, int difficulty, vector<Transaction> &transactions, int threadNr);
     Block(string prevHash, string version, int difficulty, vector<Transaction> &transactions);
+    Block(const Block &block);
     string getBlockHash();
     string getPrevHash();
     string getTimestamp();

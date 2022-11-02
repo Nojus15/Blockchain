@@ -27,7 +27,7 @@ const static double targetTime = 1;
 class Client
 {
     // std::vector<Block> blocks;
-    Block prevBlock;
+    Block *prevBlock;
     int blockCounter = 0;
 
     unordered_map<string, User> users;
@@ -59,6 +59,7 @@ class Client
     int invalidTransactionCounter = 0;
 
 public:
+    Client();
     void startMining(int numberOfThreads);
 
     void getBlockCount();
