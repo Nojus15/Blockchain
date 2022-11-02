@@ -69,7 +69,7 @@ void Generator::genTransactionsFile(int count)
     int userCount = users.size() - 1;
     Transaction *tx;
     User *sender, *reciever;
-    int amount;
+    int paymentAmount, inputedAmount;
 
     vector<Transaction> txs(count);
 
@@ -86,11 +86,12 @@ void Generator::genTransactionsFile(int count)
             i--;
             continue;
         }
-        amount = this->genInt(0, sender->getBalance());
+        paymentAmount = this->genInt(0, sender->getBalance() / 2);
+        inputedAmount = this->genInt(paymentAmount, sender->getBalance());
         tx = &txs.at(i);
-        tx->addInput(sender->getPublicKey(), sender->getBalance());
-        tx->addOutput(sender->getPublicKey(), sender->getBalance() - amount);
-        tx->addOutput(reciever->getPublicKey(), amount);
+        tx->addInput(sender->getPublicKey(), inputedAmount);
+        tx->addOutput(sender->getPublicKey(), inputedAmount - paymentAmount);
+        tx->addOutput(reciever->getPublicKey(), paymentAmount);
 
         string valToHash = "";
 
@@ -105,8 +106,7 @@ void Generator::genTransactionsFile(int count)
             valToHash += std::to_string(out.amount);
         }
 
-        string txIdToHash = sender->getPublicKey() + to_string(sender->getBalance()) + sender->getPublicKey() + to_string((sender->getBalance() - amount)) + reciever->getPublicKey() + to_string(amount);
-        tx->setTxID(this->hasher.hashString(txIdToHash));
+        tx->setTxID(this->hasher.hashString(valToHash));
     }
     cout << "Transaction generation time: " << timer.Stop() << "s" << endl;
 

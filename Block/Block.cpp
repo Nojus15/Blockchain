@@ -100,17 +100,17 @@ int Block::getMinedThreadNumber()
 
 bool Block::mine(bool &isMined)
 {
-    cout << "mine called" << endl;
     Hasher hasher;
     string target = this->calcDifficultyTargetHash();
 
     while (!isMined && target < (hash = hasher.hashString(prevHash + timestamp + version + to_string(nonce) + merkleRootHash + to_string(difficulty))))
     {
         nonce++;
-        if (nonce % 500 == 0)
-            cout << "Thread: " << omp_get_thread_num() << " Nonce: " << nonce << " Target: " << target << " Currend guess: " << hash << '\r';
+        if (nonce % 1000 == 0)
+            cout << "Thread: " << omp_get_thread_num() << " Nonce: " << nonce << " Target: " << target << " Current guess: " << hash << '\r';
+        if (nonce >= 100000)
+            calcTimestamp();
     }
-    cout << "mined" << endl;
 
     if (!isMined && hash < target)
     {
