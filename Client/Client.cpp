@@ -4,6 +4,8 @@ void Client::startMining(int numberOfThreads)
 {
     this->loadAllTransactions();
     this->loadAllUsers();
+    File file;
+    file.clearFile("blocks.txt");
 
     programTimer.Start();
     while (transactions.size() > 0)
@@ -21,21 +23,22 @@ void Client::startMining(int numberOfThreads)
             bool first = blocksCandidates.at(i).mine(mined);
 
             if (first)
-                blocks.push_back(blocksCandidates.at(i));
+                prevBlock = blocksCandidates.at(i);
         }
 
         cout << string(200, ' ') << endl; // to override last line
 
         allTime += blockTimer.Stop();
 
-        blocks.back().printFormatedBlockInfo();
-        this->removeAddedTransactions(blocks.back().getAllTransactions());
-        this->updateUsersBalances(blocks.back().getAllTransactions());
+        prevBlock.appendBlockToFile();
+        prevBlock.printFormatedBlockInfo();
+        this->removeAddedTransactions(prevBlock.getAllTransactions());
+        this->updateUsersBalances(prevBlock.getAllTransactions());
     }
     double programTime = programTimer.Stop();
-    cout << "Average block mine time: " << programTime / this->blocks.size() << endl;
+    cout << "Average block mine time: " << programTime / blockCounter << endl;
     cout << "All program time: " << programTime << endl;
-    this->printBlocksToFile();
+    cout << "Invalid transaction count: " << invalidTransactionCounter << endl;
     this->printUsersToFile(users);
 }
 void Client::loadAllTransactions()
@@ -83,29 +86,6 @@ void Client::loadAllUsers()
     {
         users.insert(std::make_pair(publicKey, User(name, publicKey, balance)));
     }
-};
-void Client::printBlocksToFile()
-{
-    stringstream os;
-    for (auto &block : this->blocks)
-    {
-        os << block.getBlockHash() << " " << block.getMekleRootHash() << " " << block.getPrevHash() << " " << block.getDifficulty() << " " << block.getTimestamp() << " " << block.getNonce() << " " << block.getVersion() << " " << block.getMinedThreadNumber() << endl;
-        for (auto &tx : block.getAllTransactions())
-        {
-            os << tx.getTxID() << endl;
-
-            for (auto &in : tx.getInputs())
-                os << in.userPK << " " << in.amount << " ";
-            os << endl;
-            for (auto &out : tx.getOutputs())
-                os << out.userPK << " " << out.amount << " ";
-            os << endl;
-        }
-        os << string(66, '-') << endl;
-    }
-
-    File file;
-    file.writeFile("blocks.txt", os);
 };
 vector<Block> Client::readBlocksFromFile()
 {
@@ -205,13 +185,14 @@ void Client::validateTransactions(vector<Transaction> &txs)
                                             { return tx.getTxID() == txId; }));
             txs.erase(it);
             it--;
+            invalidTransactionCounter++;
         }
     }
 };
 void Client::ajustDifficulty()
 {
-    if (this->blocks.size() > 0)
-        difficulty += targetTime - floor(allTime / this->blocks.size());
+    if (blockCounter > 0)
+        difficulty += targetTime - floor(allTime / blockCounter);
     if (difficulty < 0)
         difficulty = 0;
 }
@@ -227,7 +208,7 @@ vector<Transaction> Client::getRandomNumberOfValidTransactions()
 };
 string Client::getPrevBlockHash()
 {
-    return this->blocks.empty() ? "0000000000000000000000000000000000000000000000000000000000000000" : this->blocks.back().getBlockHash();
+    return blockCounter == 0 ? string(64, '0') : prevBlock.getBlockHash();
 }
 void Client::updateUsersBalances(vector<Transaction> &transactionsToBlock)
 {
@@ -312,7 +293,7 @@ void Client::getAverageDifficulty()
     {
         avgDifficulty += block.getDifficulty();
     }
-    cout << "Average difficulty: " << avgDifficulty << endl;
+    cout << "Average difficulty: " << avgDifficulty / blocks.size() << endl;
 };
 void Client::getBlockTransaction(int blockPos, int transactionPos)
 {

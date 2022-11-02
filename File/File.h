@@ -17,5 +17,7 @@ private:
 
 public:
     void writeFile(string file_name, stringstream &ss);
+    void appendToFile(string file_name, stringstream &ss);
+    void clearFile(string file_name);
     stringstream readFile(string file_name);
 };

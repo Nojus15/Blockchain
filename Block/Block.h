@@ -8,6 +8,7 @@
 #include "../Transaction/Transaction.h"
 #include "../Hasher/Hasher.h"
 #include "../MerkleTree/MerkleTree.h"
+#include "../File/File.h"
 
 #include <omp.h>
 
@@ -59,4 +60,5 @@ public:
 
     bool mine(bool &isMined);
     void printFormatedBlockInfo();
+    void appendBlockToFile();
 };

@@ -138,3 +138,23 @@ void Block::printFormatedBlockInfo()
     cout << string(150, '-') << endl;
     cout << endl;
 };
+void Block::appendBlockToFile()
+{
+    stringstream os;
+    os << hash << " " << merkleRootHash << " " << prevHash << " " << difficulty << " " << timestamp << " " << nonce << " " << version << " " << threadNumber << endl;
+    for (auto &tx : transactions)
+    {
+        os << tx.getTxID() << endl;
+
+        for (auto &in : tx.getInputs())
+            os << in.userPK << " " << in.amount << " ";
+        os << endl;
+        for (auto &out : tx.getOutputs())
+            os << out.userPK << " " << out.amount << " ";
+        os << endl;
+    }
+    os << string(66, '-') << endl;
+
+    File file;
+    file.appendToFile("blocks.txt", os);
+}

@@ -24,3 +24,14 @@ void File::writeFile(string file_name, stringstream &ss)
     file << ss.rdbuf();
     file.close();
 }
+void File::appendToFile(string file_name, stringstream &ss)
+{
+    std::ofstream file("txt_files/" + file_name, std::ios_base::app);
+    file << ss.rdbuf();
+    file.close();
+};
+void File::clearFile(string file_name)
+{
+    std::ofstream file("txt_files/" + file_name);
+    file.close();
+};

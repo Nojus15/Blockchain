@@ -26,7 +26,10 @@ const static double targetTime = 1;
 
 class Client
 {
-    std::vector<Block> blocks;
+    // std::vector<Block> blocks;
+    Block prevBlock;
+    int blockCounter = 0;
+
     unordered_map<string, User> users;
     vector<Transaction> transactions;
 
@@ -37,7 +40,6 @@ class Client
     void loadAllTransactions();
     void loadAllUsers();
 
-    void printBlocksToFile();
     vector<Block> readBlocksFromFile();
     void printUsersToFile(unordered_map<string, User> users);
 
@@ -53,6 +55,8 @@ class Client
 
     int difficulty = 20;
     double allTime = 0;
+
+    int invalidTransactionCounter = 0;
 
 public:
     void startMining(int numberOfThreads);
