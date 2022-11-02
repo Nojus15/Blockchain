@@ -18,6 +18,12 @@ To run simulation you first have to create users file, then transactions file, a
 Users balances are updated to the file after the mining is complete. Blocks are appended to the "blocks.txt" file after every block
 to save some RAM.
 
+On average block should be generated each second, but the acuracy depends on how many blocks are being mined.
+The more blocks, the more acurate average block mining time is.
+
+Adding more threads to mining process will not increase the speed on blocks mined, instead it will increase the difficulty based on
+blocks mining time.
+
 ### Block mining
 
 Each mined block is printed to the terminal.
