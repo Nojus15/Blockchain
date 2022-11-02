@@ -99,6 +99,8 @@ string Hasher::addBinary(string b1, string b2)
     stringstream ss;
     for (auto it = sum; it != sum + length; it++)
         ss << *it;
+
+    delete[] sum;
     return ss.str();
 };
 
