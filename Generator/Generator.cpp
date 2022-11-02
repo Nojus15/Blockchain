@@ -86,8 +86,8 @@ void Generator::genTransactionsFile(int count)
             i--;
             continue;
         }
-        paymentAmount = this->genInt(0, sender->getBalance() / 2);
-        inputedAmount = this->genInt(paymentAmount, sender->getBalance());
+        paymentAmount = this->genInt(0, sender->getBalance() / 4);
+        inputedAmount = this->genInt(paymentAmount, sender->getBalance() / 2);
         tx = &txs.at(i);
         tx->addInput(sender->getPublicKey(), inputedAmount);
         tx->addOutput(sender->getPublicKey(), inputedAmount - paymentAmount);
